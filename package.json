@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/shmatov/jshint-jsx",
   "dependencies": {
-    "jshint": "2.4.x",
+    "jshint": "^2.5.8",
     "lodash": "^2.4.1",
-    "react-tools": "^0.10.0"
+    "react-tools": "^0.12.0"
   }
 }
