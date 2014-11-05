@@ -19,6 +19,13 @@ var jsxhint = (function() {
         'W102': true
     };
 
+    var custom = {
+        'W101': function (line) {
+            var maxlen = jshint.data().options.maxlen;
+            return line.length <= maxlen;
+        }
+    };
+
     function jsxhint() {
         var args = Array.prototype.slice.call(arguments),
             code = args[0],
@@ -40,12 +47,20 @@ var jsxhint = (function() {
             errors = jshint.errors;
         }
 
-        var modified = transformedCode ?
-            modifiedLines(code.split('\n'), transformedCode.split('\n')) :
-            {};
+        var originalLines = code.split('\n');
+        var transformedLines = transformedCode ? transformedCode.split('\n') : [];
+        var modified = transformedCode ? modifiedLines(originalLines, transformedLines) : {};
 
         jsxhint.errors = _.reject(errors, function(e) {
-            return !e || (modified[e.line - 1] && ignored[e.code]);
+            if (!e || (modified[e.line - 1] && ignored[e.code])) {
+                return true;
+            }
+
+            if (modified[e.line - 1] && custom[e.code]) {
+                return custom[e.code](originalLines[e.line - 1], transformedLines[e.line - 1]);
+            }
+
+            return false;
         });
     }
 
