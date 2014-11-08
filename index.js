@@ -13,17 +13,14 @@ var jsxhint = (function() {
         }, {});
     }
 
-    var ignored = {
-        'W109': true,
+    var ignoreError = {
         'W064': true,
-        'W102': true
-    };
-
-    var custom = {
         'W101': function (line) {
             var maxlen = jshint.data().options.maxlen;
             return line.length <= maxlen;
-        }
+        },
+        'W102': true,
+        'W109': true
     };
 
     function jsxhint() {
@@ -52,15 +49,15 @@ var jsxhint = (function() {
         var modified = transformedCode ? modifiedLines(originalLines, transformedLines) : {};
 
         jsxhint.errors = _.reject(errors, function(e) {
-            if (!e || (modified[e.line - 1] && ignored[e.code])) {
-                return true;
+            var ignore = ignoreError[e.code];
+
+            if (!modified[e.line - 1] || !ignore) {
+                return false;
             }
 
-            if (modified[e.line - 1] && custom[e.code]) {
-                return custom[e.code](originalLines[e.line - 1], transformedLines[e.line - 1]);
-            }
-
-            return false;
+            return _.isFunction(ignore) ?
+                ignore(originalLines[e.line - 1], transformedLines[e.line - 1]) :
+                true;
         });
     }
 
