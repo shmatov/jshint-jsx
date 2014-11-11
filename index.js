@@ -48,6 +48,9 @@ var jsxhint = (function() {
         var transformedLines = transformedCode ? transformedCode.split('\n') : [];
         var modified = transformedCode ? modifiedLines(originalLines, transformedLines) : {};
 
+        // workaround the errors array sometimes containing `null`
+        errors = _.compact(errors);
+
         jsxhint.errors = _.reject(errors, function(e) {
             var ignore = ignoreError[e.code];
 
