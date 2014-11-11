@@ -13,10 +13,14 @@ var jsxhint = (function() {
         }, {});
     }
 
-    var ignored = {
-        'W109': true,
+    var ignoreError = {
         'W064': true,
-        'W102': true
+        'W101': function (line) {
+            var maxlen = jshint.data().options.maxlen;
+            return line.length <= maxlen;
+        },
+        'W102': true,
+        'W109': true
     };
 
     function jsxhint() {
@@ -40,12 +44,23 @@ var jsxhint = (function() {
             errors = jshint.errors;
         }
 
-        var modified = transformedCode ?
-            modifiedLines(code.split('\n'), transformedCode.split('\n')) :
-            {};
+        var originalLines = code.split('\n');
+        var transformedLines = transformedCode ? transformedCode.split('\n') : [];
+        var modified = transformedCode ? modifiedLines(originalLines, transformedLines) : {};
+
+        // workaround the errors array sometimes containing `null`
+        errors = _.compact(errors);
 
         jsxhint.errors = _.reject(errors, function(e) {
-            return !e || (modified[e.line - 1] && ignored[e.code]);
+            var ignore = ignoreError[e.code];
+
+            if (!modified[e.line - 1] || !ignore) {
+                return false;
+            }
+
+            return _.isFunction(ignore) ?
+                ignore(originalLines[e.line - 1], transformedLines[e.line - 1]) :
+                true;
         });
     }
 
