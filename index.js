@@ -27,6 +27,7 @@ var jsxhint = (function() {
         var args = Array.prototype.slice.call(arguments),
             code = args[0],
             transformedCode,
+            success = false,
             errors = [];
 
         try {
@@ -40,7 +41,7 @@ var jsxhint = (function() {
         }
 
         if (_.isEmpty(errors)) {
-            jshint.apply(null, args);
+            success = jshint.apply(null, args);
             errors = jshint.errors;
         }
 
@@ -62,6 +63,9 @@ var jsxhint = (function() {
                 ignore(originalLines[e.line - 1], transformedLines[e.line - 1]) :
                 true;
         });
+
+        jsxhint.data = jshint.data;
+        return success;
     }
 
     jsxhint.errors = [];
