@@ -33,11 +33,16 @@ var jsxhint = (function() {
         try {
             args[0] = transformedCode = transformJSX(code);
         } catch (e) {
-            errors.push({
-                line: e.lineNumber,
-                character: e.column,
-                reason: e.description
-            });
+            // sometimes react-tools throws error without information about line
+            if (e.lineNumber === undefined) {
+                errors.push(null);
+            } else {
+                errors.push({
+                    line: e.lineNumber,
+                    character: e.column,
+                    reason: e.description
+                });
+            }
         }
 
         if (_.isEmpty(errors)) {
