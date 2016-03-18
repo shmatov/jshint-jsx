@@ -1,9 +1,8 @@
 'use strict';
 var jshint = require('jshint').JSHINT,
-    transformJSX = require('react-tools').transform,
     _ = require('lodash');
 
-var jsxhint = (function() {
+var xsxhint = function(transformer) {
     function modifiedLines(a, b) {
         return _(a).zip(b).reduce(function(modified, lines, i) {
             if (lines[0] !== lines[1]) {
@@ -31,7 +30,7 @@ var jsxhint = (function() {
             errors = [];
 
         try {
-            args[0] = transformedCode = transformJSX(code);
+            args[0] = transformedCode = transformer(code);
         } catch (e) {
             // sometimes react-tools throws error without information about line
             if (e.lineNumber === undefined) {
@@ -76,9 +75,13 @@ var jsxhint = (function() {
     jsxhint.errors = [];
 
     return jsxhint;
-})();
+};
+
+var jsxhint = xsxhint(require('react-tools').transform);
+var msxhint = xsxhint(require('msx').transform);
 
 module.exports = {
     JSHINT: jshint,
-    JSXHINT: jsxhint
+    JSXHINT: jsxhint,
+    MSXHINT: msxhint
 };
