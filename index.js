@@ -53,7 +53,7 @@ var xsxhint = function(transformer) {
         var transformedLines = transformedCode ? transformedCode.split('\n') : [];
         var modified = transformedCode ? modifiedLines(originalLines, transformedLines) : {};
 
-        // workaround the errors array sometimes containing `null`
+        // there can be some nulls, but they cannot be displayed, so let's remove them.
         errors = _.compact(errors);
 
         jsxhint.errors = _.reject(errors, function(e) {
